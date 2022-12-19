@@ -46,7 +46,7 @@ static struct list destruction_req;
 static long long idle_ticks;    /* # of timer ticks spent idle. */
 static long long kernel_ticks;  /* # of timer ticks in kernel threads. */
 static long long user_ticks;    /* # of timer ticks in user programs. */
-static long long global_ticks = LLONG_MAX;
+static long long global_ticks = INT64_MAX;
 
 /* Scheduling. */
 #define TIME_SLICE 4            /* # of timer ticks to give each thread. */
@@ -340,11 +340,14 @@ thread_sleep (int64_t ticks) {
 	intr_set_level (old_level);
 }
 
+int64_t
+get_next_tick_to_awake(void){
+	return global_ticks;
 }
 
 void
-update_next_global_tick (){
-	
+update_next_global_tick (int64_t ticks){
+	global_ticks = ticks;
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
