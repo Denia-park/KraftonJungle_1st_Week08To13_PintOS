@@ -313,8 +313,36 @@ thread_yield (void) {
 }
 
 void
-thread_awake (void) {
+thread_awake (int64_t ticks) {
+	struct list_elem *cur_e;
+	enum intr_level old_level;
 
+	int64_t next_awake_ticks = INT64_MAX;
+
+	printf("end : %x \n",list_end (&sleep_list));
+
+	old_level = intr_disable ();
+
+    for (cur_e = list_begin (&sleep_list);
+        cur_e != list_end (&sleep_list);
+        ) {
+
+        struct thread *cur_thread = list_entry (cur_e, struct thread, elem);
+
+	    if (cur_thread ->local_ticks <= ticks){
+			cur_e = list_remove(cur_e);
+			thread_unblock(cur_thread);
+		} else {
+			if(cur_thread -> local_ticks < next_awake_ticks){
+				next_awake_ticks = cur_thread -> local_ticks;
+			}
+			cur_e = list_next (cur_e);
+		}	
+    }
+
+	update_next_global_tick(next_awake_ticks);
+
+	intr_set_level (old_level);
 }
 
 void
