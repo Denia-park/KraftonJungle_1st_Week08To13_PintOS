@@ -91,10 +91,15 @@ struct thread {
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
-	long long local_ticks;
+	int origin_priority;	   // origin priority
+	long long local_ticks;	   // 추가한 local tick member
+	struct lock *wait_on_lock; // 내가 기다리고 있는 lock의 종류
+
+	struct list donation_list; // donation 리스트
 
 	/* Shared between thread.c and synch.c. */
-	struct list_elem elem;              /* List element. */
+	struct list_elem elem;	 /* List element. */
+	struct list_elem d_elem; // 도네이션 element
 
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */
