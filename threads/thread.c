@@ -350,8 +350,6 @@ thread_awake (int64_t ticks) {
 
 	int64_t next_awake_ticks = INT64_MAX;
 
-	old_level = intr_disable ();
-
     for (cur_e = list_begin (&sleep_list);
         cur_e != list_end (&sleep_list);
         ) {
@@ -371,7 +369,6 @@ thread_awake (int64_t ticks) {
 
 	update_next_global_tick(next_awake_ticks);
 
-	intr_set_level (old_level);
 }
 
 void
