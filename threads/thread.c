@@ -494,17 +494,21 @@ kernel_thread (thread_func *function, void *aux) {
    NAME. */
 static void
 init_thread (struct thread *t, const char *name, int priority) {
-	ASSERT (t != NULL);
-	ASSERT (PRI_MIN <= priority && priority <= PRI_MAX);
-	ASSERT (name != NULL);
+	ASSERT(t != NULL);
+	ASSERT(PRI_MIN <= priority && priority <= PRI_MAX);
+	ASSERT(name != NULL);
 
-	memset (t, 0, sizeof *t);
+	memset(t, 0, sizeof *t);
 	t->status = THREAD_BLOCKED;
-	strlcpy (t->name, name, sizeof t->name);
-	t->tf.rsp = (uint64_t) t + PGSIZE - sizeof (void *);
+	strlcpy(t->name, name, sizeof t->name);
+	t->tf.rsp = (uint64_t)t + PGSIZE - sizeof(void *);
 	t->priority = priority;
+	t->origin_priority = priority;
 	t->magic = THREAD_MAGIC;
-	t->local_ticks = INT64_MAX;
+	t->local_ticks = INT64_MAX;		// 로컬 틱 max 값
+	list_init(&(t->donation_list)); // 도네이션 리스트 초기화
+
+	// elem, d_elem은 프로그램 돌아가면서 값을 넣기 때문에 초기화 안해도 됨
 }
 
 /* Chooses and returns the next thread to be scheduled.  Should
