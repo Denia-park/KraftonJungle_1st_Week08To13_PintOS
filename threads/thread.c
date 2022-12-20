@@ -407,6 +407,22 @@ void
 thread_set_priority (int new_priority) {
 	thread_current ()->priority = new_priority;
 	test_max_priority();
+	refresh_priority();
+}
+
+// 우선 순위 다시 계산
+void refresh_priority(void)
+{
+	struct thread *curr = thread_current();
+	struct list *d_list = &(curr->donation_list);
+	curr->priority = curr->origin_priority;
+	int tmp_priority = 0;
+	for (struct list_elem *d_e = list_begin(d_list); d_e != list_end(d_list); d_e = list_next(d_list))
+	{
+		struct thread *tmp = list_entry(d_e, struct thread, d_elem);
+		tmp_priority = max(tmp_priority, tmp->priority);
+	}
+	curr->priority = max(tmp_priority, curr->origin_priority);
 }
 
 /* Returns the current thread's priority. */

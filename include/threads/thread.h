@@ -28,6 +28,8 @@ typedef int tid_t;
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
 
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+
 /* A kernel thread or user process.
  *
  * Each thread structure is stored in its own 4 kB page.  The
@@ -149,6 +151,7 @@ void test_max_priority (void);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+void refresh_priority(void);
 
 bool cmp_priority (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
