@@ -133,7 +133,6 @@ timer_interrupt (struct intr_frame *args UNUSED) {
 
 	if(get_next_tick_to_awake() <= ticks) {
 		thread_awake(ticks);
-		test_max_priority();
 	}
 }
 
