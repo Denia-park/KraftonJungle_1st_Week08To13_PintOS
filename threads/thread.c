@@ -312,6 +312,20 @@ thread_yield (void) {
 	intr_set_level (old_level);
 }
 
+// a : insert struct
+// b : origin struct 
+bool
+cmp_priority (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED){
+	struct thread *insert = list_entry(a, struct thread, elem);
+	struct thread *origin = list_entry(b, struct thread, elem);
+	
+	if(insert->priority > origin->priority){
+		return true;
+	}
+
+	return false;
+}
+
 void
 thread_awake (int64_t ticks) {
 	struct list_elem *cur_e;
