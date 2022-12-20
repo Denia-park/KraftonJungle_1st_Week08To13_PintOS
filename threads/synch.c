@@ -73,6 +73,21 @@ sema_down (struct semaphore *sema) {
 	intr_set_level (old_level);
 }
 
+/*  첫번째 인자로 주어진 세마포어를 위해 대기 중인 가장 높은 우선순위의
+	스레드와 두번째 인자로 주어진 세마포어를 위해 대기 중인 가장 높은
+	우선순위의 스레드와 비교*/
+bool
+cmp_sem_priority(const struct list_elem *a,const struct list_elem *b, void *aux UNUSED){
+	struct thread *insert = list_entry(a, struct thread, elem);
+	struct thread *origin = list_entry(b, struct thread, elem);
+	
+	if(insert->priority > origin->priority){
+		return true;
+	}
+
+	return false;
+}
+
 /* Down or "P" operation on a semaphore, but only if the
    semaphore is not already 0.  Returns true if the semaphore is
    decremented, false otherwise.
