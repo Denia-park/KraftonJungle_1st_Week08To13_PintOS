@@ -140,6 +140,8 @@ void thread_awake(int64_t ticks);
 void update_next_global_tick (int64_t ticks);
 int64_t get_next_tick_to_awake(void);
 
+void test_max_priority (void);
+
 int thread_get_priority (void);
 void thread_set_priority (int);
 

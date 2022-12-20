@@ -211,6 +211,8 @@ thread_create (const char *name, int priority,
 	/* Add to run queue. */
 	thread_unblock (t);
 
+	test_max_priority();
+
 	return tid;
 }
 
@@ -326,6 +328,21 @@ cmp_priority (const struct list_elem *a, const struct list_elem *b, void *aux UN
 	return false;
 }
 
+/* 현재 수행중인 스레드와 가장 높은 우선순위의 스레드의 우선순위를 
+    비교하여 스케줄링*/
+void test_max_priority (void) {
+	struct thread *cur_th = thread_current ();
+	if (list_empty(&ready_list)) {
+		return;
+	}
+	
+    struct thread *ready_front_th = list_entry(list_front(&ready_list),struct thread, elem);
+
+	if(cur_th->priority < ready_front_th->priority){
+		thread_yield();
+	}
+}
+
 void
 thread_awake (int64_t ticks) {
 	struct list_elem *cur_e;
@@ -392,6 +409,7 @@ update_next_global_tick (int64_t ticks){
 void
 thread_set_priority (int new_priority) {
 	thread_current ()->priority = new_priority;
+	test_max_priority();
 }
 
 /* Returns the current thread's priority. */
