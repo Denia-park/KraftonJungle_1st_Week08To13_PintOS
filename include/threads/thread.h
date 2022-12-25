@@ -28,8 +28,6 @@ typedef int tid_t;
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
 
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-
 /* A kernel thread or user process.
  *
  * Each thread structure is stored in its own 4 kB page.  The
@@ -93,15 +91,13 @@ struct thread {
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
-	int origin_priority;	   // origin priority
-	long long local_ticks;	   // 추가한 local tick member
-	struct lock *wait_on_lock; // 내가 기다리고 있는 lock의 종류
-
-	struct list donation_list; // donation 리스트
 
 	/* Shared between thread.c and synch.c. */
-	struct list_elem elem;	 /* List element. */
-	struct list_elem d_elem; // 도네이션 element
+	struct list_elem elem;              /* List element. */
+	
+	/* sleep list의 thread 중에서의 가장 최소 local tick 값 =  global tick */
+	int64_t tick_to_awake;
+
 
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */
@@ -115,6 +111,13 @@ struct thread {
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */
 	unsigned magic;                     /* Detects stack overflow. */
+
+	int origin_priority;	   // origin priority
+	struct lock *wait_on_lock; //쓰레드가 기다리고 있는 lock 자료구조 주소 저장 
+	struct list donation_list; // donation 리스트 (multiple donation)
+
+	/* Shared between thread.c and synch.c. */
+	struct list_elem d_elem; // 도네이션 element
 };
 
 /* If false (default), use round-robin scheduler.
@@ -141,25 +144,24 @@ const char *thread_name (void);
 void thread_exit (void) NO_RETURN;
 void thread_yield (void);
 
-void thread_sleep(int64_t ticks);
-void thread_awake(int64_t ticks);
-
-void update_next_global_tick (int64_t ticks);
-int64_t get_next_tick_to_awake(void);
-
-void test_max_priority (void);
-
 int thread_get_priority (void);
 void thread_set_priority (int);
-void refresh_priority(void);
-
-bool cmp_priority (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
+/* thread_sleep & wake 관련 함수 추가 */
+void thread_sleep(int64_t ticks);
+void thread_awake(int64_t ticks);
+void update_next_tick_to_awake(int64_t ticks);
+int64_t get_next_tick_to_awake(void);
+
+
 void do_iret (struct intr_frame *tf);
 
+/* Priority Scheduling 관련 함수 추가 */
+void test_max_priority(void);
+bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 #endif /* threads/thread.h */
