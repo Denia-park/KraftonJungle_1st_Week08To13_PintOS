@@ -49,6 +49,8 @@ process_create_initd (const char *file_name) {
 	if (fn_copy == NULL)
 		return TID_ERROR;
 	strlcpy (fn_copy, file_name, PGSIZE);
+	// strlcpy(char * dest, const char * src, size_t size) : 문자열을 복사해주는 함수
+	// size는 src의 길이 이하일때 이용되는 녀석 => size보다 큰 값을 넣어주면 src 값에 맞춰서 복사됨
 
 	/* Create a new thread to execute FILE_NAME. */
 	tid = thread_create (file_name, PRI_DEFAULT, initd, fn_copy);
@@ -330,13 +332,13 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 
 	/* Allocate and activate page directory. */
-	t->pml4 = pml4_create ();
+	t->pml4 = pml4_create (); // 페이지 디렉토리 생성
 	if (t->pml4 == NULL)
 		goto done;
-	process_activate (thread_current ());
+	process_activate (thread_current ()); //페이지 테이블 활성화
 
 	/* Open executable file. */
-	file = filesys_open (file_name);
+	file = filesys_open (file_name); //프로그램 파일 Open
 	if (file == NULL) {
 		printf ("load: %s: open failed\n", file_name);
 		goto done;
