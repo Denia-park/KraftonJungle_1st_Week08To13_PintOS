@@ -335,6 +335,20 @@ load (const char *file_name, struct intr_frame *if_) {
 	bool success = false;
 	int i;
 
+	//Argument Passing
+	char *arg_list[128];
+	char *token, *save_ptr;
+	int token_count = 0;
+
+	token = strtok_r(file_name," ",&save_ptr);
+	arg_list[token_count] = token;
+
+	while (token != NULL){ 		
+		token = strtok_r(NULL," ",&save_ptr);
+		token_count++;
+		arg_list[token_count] = token;
+	}
+
 	/* Allocate and activate page directory. */
 	t->pml4 = pml4_create (); // 페이지 디렉토리 생성
 	if (t->pml4 == NULL)
