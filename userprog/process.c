@@ -186,6 +186,10 @@ process_exec (void *f_name) {
 	if (!success)
 		return -1;
 
+	// hex_dump(_if.rsp, _if.rsp, USER_STACK - _if.rsp, true);
+	//hex_dump(offset[어디서 부터 메모리를 찍을지 표시], data[어떤 데이터를 메모리에 덮어씌울껀지]
+	//, size[얼만큼 사이즈를 표시할것인지], ASCII 표시 여부);
+
 	/* Start switched process. */
 	do_iret (&_if);
 	NOT_REACHED ();
