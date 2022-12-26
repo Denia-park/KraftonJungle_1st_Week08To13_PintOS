@@ -436,7 +436,8 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
-
+	 argument_stack(arg_list, token_count, if_);
+	
 	success = true;
 
 done:
@@ -445,6 +446,53 @@ done:
 	return success;
 }
 
+void
+argument_stack(char **argv, int argc, struct intr_frame *if_){
+	char *arg_address[128];
+
+	// 거꾸로 삽입 => 스택은 반대 방향으로 확장
+
+	/* 맨 끝 NULL 값 제외하고 스택에 저장 */
+	for(int i = argc - 1; i >= 0; i--){
+		int argv_len = strlen(argv[i]);
+
+		/* 
+		if_->rsp: 현재 user stack에서 현재 위치를 가리키는 스택 포인터.
+		각 인자에서 인자 크기(argv_len)를 읽고 (이때 각 인자에 sentinel이 포함되어 있으니 +1 - strlen에서는 sentinel 빼고 읽음)
+		그 크기만큼 rsp를 내려준다. 그 다음 빈 공간만큼 memcpy를 해준다.
+		 */
+		if_->rsp = if_->rsp - (argv_len + 1);
+		memcpy(if_->rsp, argv[i], argv_len+1);
+		arg_address[i] = if_->rsp;
+	}
+
+	/* word-align: 8의 배수 맞추기 위해 padding 삽입*/
+	while (if_->rsp % 8 != 0) {
+		if_->rsp--; // 주소값 1 내리기
+		* (uint8_t *)if_->rsp = 0; // 0 값 으로 패팅
+	}
+
+	//데이터들의 주소값을 삽입
+
+	//NULL 값을 삽입
+	if_->rsp = if_->rsp - 8;
+	memset(if_->rsp, 0,sizeof(char**));
+
+    //실제 주소값 삽입
+	for(int i = argc - 1; i >= 0; i--){
+		if_->rsp = if_->rsp - 8;
+		
+		memcpy(if_->rsp, &arg_address[i], sizeof(char**));
+	}
+
+	if_->R.rdi = argc; //rdi : 1st argument
+	/* fake return address 위의 첫번째 agv address 를 가리키는 값을 저장 */
+	if_->R.rsi = if_->rsp;  //rsi : 2nd argument
+
+	/* fake return address */
+	if_->rsp = if_->rsp - 8; /* void point : 8byte */
+	memset(if_->rsp, 0, sizeof(void *));
+}
 
 /* Checks whether PHDR describes a valid, loadable segment in
  * FILE and returns true if so, false otherwise. */
