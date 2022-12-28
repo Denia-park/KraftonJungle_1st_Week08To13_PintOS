@@ -466,7 +466,7 @@ argument_stack(char **argv, int argc, struct intr_frame *if_){
 		그 크기만큼 rsp를 내려준다. 그 다음 빈 공간만큼 memcpy를 해준다.
 		 */
 		if_->rsp = if_->rsp - (argv_len + 1);
-		memcpy(if_->rsp, argv[i], argv_len+1);
+		memcpy((void *) if_->rsp, argv[i], argv_len+1);
 		arg_address[i] = if_->rsp;
 	}
 
@@ -480,13 +480,13 @@ argument_stack(char **argv, int argc, struct intr_frame *if_){
 
 	//NULL 값을 삽입
 	if_->rsp = if_->rsp - 8;
-	memset(if_->rsp, 0,sizeof(char**));
+	memset((void *) if_->rsp, 0,sizeof(char **));
 
     //실제 주소값 삽입
 	for(int i = argc - 1; i >= 0; i--){
 		if_->rsp = if_->rsp - 8;
 		
-		memcpy(if_->rsp, &arg_address[i], sizeof(char**));
+		memcpy((void *) if_->rsp, &arg_address[i], sizeof(char**));
 	}
 
 	if_->R.rdi = argc; //rdi : 1st argument
@@ -495,7 +495,7 @@ argument_stack(char **argv, int argc, struct intr_frame *if_){
 
 	/* fake return address */
 	if_->rsp = if_->rsp - 8; /* void point : 8byte */
-	memset(if_->rsp, 0, sizeof(void *));
+	memset((void *) if_->rsp, 0, sizeof(void *));
 }
 
 /* Checks whether PHDR describes a valid, loadable segment in
