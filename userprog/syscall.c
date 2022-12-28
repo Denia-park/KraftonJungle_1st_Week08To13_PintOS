@@ -1,5 +1,6 @@
 #include "userprog/syscall.h"
 #include "threads/init.h"
+#include "filesys/filesys.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
@@ -74,8 +75,10 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		// 	exec(f->R.rdi);
 		// case SYS_WAIT:
 		// 	wait(f->R.rdi);
-		// case SYS_CREATE:
-		// 	create(f->R.rdi, f->R.rsi);		
+			// break;
+		case SYS_CREATE:
+			create((char *) f->R.rdi, f->R.rsi);		
+			break;
 		// case SYS_REMOVE:
 		// 	remove(f->R.rdi);		
 		// case SYS_OPEN:
@@ -93,7 +96,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		// case SYS_CLOSE:
 		// 	close(f->R.rdi);	
 	}
-	printf ("system call!\n");
+	printf ("system call! : %d \n", sys_number);
 	thread_exit ();
 }
 
@@ -108,4 +111,9 @@ exit (int status) {
 	curr->exit_status = status;
 
 	thread_exit();
+}
+bool
+create (const char *file_name, unsigned initial_size) {
+	check_address (file_name);
+	return filesys_create(file_name, initial_size);
 }
