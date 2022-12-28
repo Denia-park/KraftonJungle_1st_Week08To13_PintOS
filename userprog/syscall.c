@@ -83,9 +83,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_CREATE:
 			create((char *) f->R.rdi, f->R.rsi);		
 			break;
-		// case SYS_REMOVE:
-		// 	remove(f->R.rdi);
-			// break;		
+		case SYS_REMOVE:
+			remove((char *) f->R.rdi);
+			break;		
 		// case SYS_OPEN:
 		// 	open(f->R.rdi);	
 			// break;	
@@ -128,4 +128,8 @@ bool
 create (const char *file_name, unsigned initial_size) {
 	check_address (file_name);
 	return filesys_create(file_name, initial_size);
+bool
+remove (const char *file_name) {
+	check_address ((void *)file_name);
+	return filesys_remove((char *) file_name);
 }
