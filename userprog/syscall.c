@@ -126,8 +126,10 @@ exit (int status) {
 }
 bool
 create (const char *file_name, unsigned initial_size) {
-	check_address (file_name);
-	return filesys_create(file_name, initial_size);
+	check_address ((void *)file_name);
+	return filesys_create((char *) file_name, initial_size);
+}
+
 bool
 remove (const char *file_name) {
 	check_address ((void *)file_name);
