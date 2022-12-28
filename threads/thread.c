@@ -481,6 +481,7 @@ init_thread (struct thread *t, const char *name, int priority) {
 
 	t->magic = THREAD_MAGIC;
 	t->tick_to_awake = INT64_MAX;
+	t->exit_status = 0;
 	
 	/* 도네이션 리스트 초기화 */ 
 	t->origin_priority = priority;
