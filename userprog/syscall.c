@@ -66,8 +66,8 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	switch(sys_number) {
 		case SYS_HALT:
 			halt();
-		// case SYS_EXIT:
-		// 	exit(f->R.rdi);
+		case SYS_EXIT:
+			exit(f->R.rdi);
 		// case SYS_FORK:
 		// 	fork(f->R.rdi);		
 		// case SYS_EXEC:
@@ -100,4 +100,12 @@ syscall_handler (struct intr_frame *f UNUSED) {
 void
 halt (void) {
 	power_off ();
+}
+
+void
+exit (int status) {
+	struct thread *curr = thread_current();
+	curr->exit_status = status;
+
+	thread_exit();
 }
