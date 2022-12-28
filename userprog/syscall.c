@@ -95,9 +95,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		// case SYS_READ:
 		// 	read(f->R.rdi, f->R.rsi, f->R.rdx);
 			// break;
-		// case SYS_WRITE:
-		// 	write(f->R.rdi, f->R.rsi, f->R.rdx);
-			// break;		
+		case SYS_WRITE:
+			write(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
+			break;		
 		// case SYS_SEEK:
 		// 	seek(f->R.rdi, f->R.rdx);
 			// break;		
@@ -134,4 +134,10 @@ bool
 remove (const char *file_name) {
 	check_address ((void *)file_name);
 	return filesys_remove((char *) file_name);
+}int
+write (int fd, const void *buffer, unsigned size) {
+	if(fd == STDOUT_FILENO){
+		putbuf(buffer, size);
+	}
+	return size;
 }
