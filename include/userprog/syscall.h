@@ -14,5 +14,6 @@ int write (int fd, const void *buffer, unsigned size);
 int open (const char *file_name);
 struct file *fd_to_struct_filep(int fd);
 int filesize (int fd);
+int read (int fd, void *buffer, unsigned size);
 
 #endif /* userprog/syscall.h */
