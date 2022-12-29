@@ -86,9 +86,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_REMOVE:
 			remove((char *) f->R.rdi);
 			break;		
-		// case SYS_OPEN:
-		// 	open(f->R.rdi);	
-			// break;	
+		case SYS_OPEN:
+			open(f->R.rdi);	
+			break;	
 		// case SYS_FILESIZE:
 		// 	filesize(f->R.rdi);
 			// break;
@@ -135,6 +135,45 @@ remove (const char *file_name) {
 	check_address ((void *)file_name);
 	return filesys_remove((char *) file_name);
 }int
+
+ /* 파일을 현재 프로세스의 fdt에 추가 */
+int add_file_to_fd_table(struct file *file) {
+	struct thread *t = thread_current();
+	struct file **fdt = t->file_descriptor_table;
+	int fd = t->fdidx; //fd값은 2부터 출발
+	
+	while (t->file_descriptor_table[fd] != NULL && fd < FDT_COUNT_LIMIT) {
+		fd++;
+	}
+
+	if (fd >= FDT_COUNT_LIMIT) {
+		return -1;
+	}
+
+	t->fdidx = fd;
+	fdt[fd] = file;
+	return fd;
+}
+
+int
+open (const char *file_name) {
+	check_address ((void *)file_name);
+	struct file * file_obj = filesys_open(file_name);
+
+	if(file_obj == NULL){
+		return -1;
+	}
+
+	int fd = add_file_to_fd_table(file_obj); // 만들어진 파일을 스레드 내 fdt 테이블에 추가
+
+	// 만약 파일을 열 수 없으면] -1을 받음
+	if (fd == -1) {
+		file_close(file_obj);
+	}
+
+	return fd;
+}
+
 write (int fd, const void *buffer, unsigned size) {
 	if(fd == STDOUT_FILENO){
 		putbuf(buffer, size);

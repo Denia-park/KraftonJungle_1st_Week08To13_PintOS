@@ -11,5 +11,6 @@ void exit (int status);
 bool create (const char *file_name, unsigned initial_size);
 bool remove (const char *file_name);
 int write (int fd, const void *buffer, unsigned size);
+int open (const char *file_name);
 
 #endif /* userprog/syscall.h */

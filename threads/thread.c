@@ -216,6 +216,14 @@ thread_create (const char *name, int priority,
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
 
+	t->file_descriptor_table = palloc_get_multiple(PAL_ZERO, FDT_PAGES);
+	if (t->file_descriptor_table == NULL) {
+		return TID_ERROR;
+	}
+	t->fdidx = 2; // 0은 stdin, 1은 stdout에 이미 할당
+	t->file_descriptor_table[0] = 1; // stdin 자리: 1 배정
+	t->file_descriptor_table[1] = 2; // stdout 자리: 2 배정
+
 	thread_unblock (t);
 	/* create 후 ready_list에 add 시 new thread와 current thread의 우선순위 비교, 
 	만약 새로운 쓰레드의 우선순위가 더 높으면 schedule 호출하고 현재 쓰레드는 yield */
