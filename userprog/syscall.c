@@ -106,9 +106,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_WRITE:
 			f->R.rax = write(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
 			break;		
-		// case SYS_SEEK:
-		// 	seek(f->R.rdi, f->R.rdx);
-			// break;		
+		case SYS_SEEK:
+			seek(f->R.rdi, f->R.rdx);
+			break;		
 		// case SYS_TELL:
 		// 	tell(f->R.rdi);	
 			// break;	
@@ -265,3 +265,17 @@ write (int fd, const void *buffer, unsigned size) {
 
 	return read_count;
 }
+
+void
+seek (int fd, unsigned position) {
+	//std in , out 을 지칭하면 바로 return
+	if (fd < 2) {
+		return;
+	}
+
+	struct file *file = fd_to_struct_filep(fd);
+	check_address((void *) file);
+
+	file_seek(file, position);
+}
+
