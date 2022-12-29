@@ -1,6 +1,7 @@
 #include "userprog/syscall.h"
 #include "threads/init.h"
 #include "filesys/filesys.h"
+#include "filesys/file.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
@@ -87,11 +88,11 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			remove((char *) f->R.rdi);
 			break;		
 		case SYS_OPEN:
-			open(f->R.rdi);	
+			open((char *) f->R.rdi);	
 			break;	
-		// case SYS_FILESIZE:
-		// 	filesize(f->R.rdi);
-			// break;
+		case SYS_FILESIZE:
+			filesize(f->R.rdi);
+			break;
 		// case SYS_READ:
 		// 	read(f->R.rdi, f->R.rsi, f->R.rdx);
 			// break;
@@ -174,6 +175,27 @@ open (const char *file_name) {
 	return fd;
 }
 
+/*  fd 값을 넣으면 해당 file을 반환하는 함수 */
+struct file *fd_to_struct_filep(int fd) {
+	if (fd < 0 || fd >= FDT_COUNT_LIMIT) {
+		return NULL;
+	}
+	
+	struct thread *t = thread_current();
+	struct file **fdt = t->file_descriptor_table;
+	
+	struct file *file = fdt[fd];
+	return file;
+}
+
+int
+filesize (int fd) {
+	struct file *fileobj = fd_to_struct_filep(fd);
+	if (fileobj == NULL) {
+		return -1;
+	}
+	file_length(fileobj);
+}
 write (int fd, const void *buffer, unsigned size) {
 	if(fd == STDOUT_FILENO){
 		putbuf(buffer, size);

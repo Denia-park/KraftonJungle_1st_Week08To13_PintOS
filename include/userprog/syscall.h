@@ -12,5 +12,7 @@ bool create (const char *file_name, unsigned initial_size);
 bool remove (const char *file_name);
 int write (int fd, const void *buffer, unsigned size);
 int open (const char *file_name);
+struct file *fd_to_struct_filep(int fd);
+int filesize (int fd);
 
 #endif /* userprog/syscall.h */
