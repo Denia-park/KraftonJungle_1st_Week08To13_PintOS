@@ -112,9 +112,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_TELL:
 			f->R.rax = tell(f->R.rdi);	
 			break;	
-		// case SYS_CLOSE:
-		// 	close(f->R.rdi);
-			// break;	
+		case SYS_CLOSE:
+			close(f->R.rdi);
+			break;	
 		default:
 			thread_exit ();
 			break;
@@ -196,6 +196,18 @@ struct file *fd_to_struct_filep(int fd) {
 	
 	struct file *file = fdt[fd];
 	return file;
+}
+
+/*  fd 값에 해당하는 테이블을 내용을 NULL로 변경*/
+void make_fd_to_null(int fd) {
+	if (fd < 0 || fd >= FDT_COUNT_LIMIT) {
+		return;
+	}
+	
+	struct thread *t = thread_current();
+	struct file **fdt = t->file_descriptor_table;
+	
+	fdt[fd] = NULL;
 }
 
 int
@@ -290,5 +302,18 @@ tell (int fd) {
 	check_address((void *) file);
 
 	return file_tell(file);
+}
+
+void
+close (int fd) {
+		//std in , out 을 지칭하면 바로 return
+	if (fd <2) {
+		return;
+	}
+
+	struct file *file = fd_to_struct_filep(fd);
+	make_fd_to_null(fd);
+
+	file_close(file);
 }
 
