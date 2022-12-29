@@ -245,8 +245,21 @@ read (int fd, void *buffer, unsigned size) {
 
 int
 write (int fd, const void *buffer, unsigned size) {
-	if(fd == STDOUT_FILENO){
+	check_address(buffer);
+	struct file *fileobj = fd_to_struct_filep(fd);
+	int read_count;
+	if (fd == STDOUT_FILENO) {
 		putbuf(buffer, size);
+		read_count = size;
+	}	
+	else if (fd == STDIN_FILENO) {
+		return -1;
 	}
-	return size;
+	else {
+		lock_acquire(&filesys_lock);
+		read_count = file_write(fileobj, buffer, size);
+		lock_release(&filesys_lock);
+	}
+
+	return read_count;
 }
