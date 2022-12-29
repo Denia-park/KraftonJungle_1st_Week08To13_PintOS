@@ -204,7 +204,7 @@ filesize (int fd) {
 	if (fileobj == NULL) {
 		return -1;
 	}
-	file_length(fileobj);
+	return file_length(fileobj);
 }
 
 int
