@@ -16,5 +16,6 @@ struct file *fd_to_struct_filep(int fd);
 int filesize (int fd);
 void seek (int fd, unsigned position);
 int read (int fd, void *buffer, unsigned size);
+unsigned tell (int fd);
 
 #endif /* userprog/syscall.h */

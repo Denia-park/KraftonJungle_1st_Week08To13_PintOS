@@ -109,9 +109,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_SEEK:
 			seek(f->R.rdi, f->R.rdx);
 			break;		
-		// case SYS_TELL:
-		// 	tell(f->R.rdi);	
-			// break;	
+		case SYS_TELL:
+			f->R.rax = tell(f->R.rdi);	
+			break;	
 		// case SYS_CLOSE:
 		// 	close(f->R.rdi);
 			// break;	
@@ -277,5 +277,18 @@ seek (int fd, unsigned position) {
 	check_address((void *) file);
 
 	file_seek(file, position);
+}
+
+unsigned
+tell (int fd) {
+	//std in , out 을 지칭하면 바로 return
+	if (fd <2) {
+		return 0;
+	}
+
+	struct file *file = fd_to_struct_filep(fd);
+	check_address((void *) file);
+
+	return file_tell(file);
 }
 
