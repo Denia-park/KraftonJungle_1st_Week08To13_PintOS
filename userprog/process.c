@@ -230,7 +230,6 @@ process_exit (void) {
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
-	printf("%s: exit(%d)\n", thread_name(), curr->exit_status);
 	process_cleanup ();
 }
 
