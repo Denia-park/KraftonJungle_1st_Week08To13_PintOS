@@ -87,22 +87,22 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		// 	wait(f->R.rdi);
 			// break;
 		case SYS_CREATE:
-			create((char *) f->R.rdi, f->R.rsi);		
+			f->R.rax = create((char *) f->R.rdi, f->R.rsi);		
 			break;
 		case SYS_REMOVE:
-			remove((char *) f->R.rdi);
+			f->R.rax = remove((char *) f->R.rdi);
 			break;		
 		case SYS_OPEN:
-			open((char *) f->R.rdi);	
+			f->R.rax = open((char *) f->R.rdi);	
 			break;	
 		case SYS_FILESIZE:
-			filesize(f->R.rdi);
+			f->R.rax = filesize(f->R.rdi);
 			break;
 		case SYS_READ:
-			read(f->R.rdi, f->R.rsi, f->R.rdx);
+			f->R.rax = read(f->R.rdi, f->R.rsi, f->R.rdx);
 			break;
 		case SYS_WRITE:
-			write(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
+			f->R.rax = write(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
 			break;		
 		// case SYS_SEEK:
 		// 	seek(f->R.rdi, f->R.rdx);
@@ -113,6 +113,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		// case SYS_CLOSE:
 		// 	close(f->R.rdi);
 			// break;	
+		default:
+			thread_exit ();
+			break;
 	}
 	printf ("system call! : %d \n", sys_number);
 	thread_exit ();
