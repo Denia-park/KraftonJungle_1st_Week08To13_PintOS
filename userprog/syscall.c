@@ -1,6 +1,7 @@
 #include "userprog/syscall.h"
 #include "filesys/filesys.h"
 #include "filesys/file.h"
+#include "devices/input.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include "threads/init.h"
@@ -14,6 +15,7 @@
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
+int add_file_to_fd_table(struct file *file);
 
 /* System call.
  *
@@ -99,7 +101,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			f->R.rax = filesize(f->R.rdi);
 			break;
 		case SYS_READ:
-			f->R.rax = read(f->R.rdi, f->R.rsi, f->R.rdx);
+			f->R.rax = read(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
 			break;
 		case SYS_WRITE:
 			f->R.rax = write(f->R.rdi, (void *) f->R.rsi, f->R.rdx);
@@ -208,10 +210,10 @@ filesize (int fd) {
 int
 read (int fd, void *buffer, unsigned size) {
 	// 유효한 주소인지부터 체크
-	check_address(buffer); // 버퍼 시작 주소 체크
-	check_address(buffer + size -1); // 버퍼 끝 주소도 유저 영역 내에 있는지 체크
+	check_address((void *) buffer); // 버퍼 시작 주소 체크
+	check_address((void *) buffer + size -1); // 버퍼 끝 주소도 유저 영역 내에 있는지 체크
 	unsigned char *buf = buffer;
-	int read_count;
+	unsigned int read_count;
 	
 	struct file *fileobj = fd_to_struct_filep(fd);
 
@@ -222,7 +224,7 @@ read (int fd, void *buffer, unsigned size) {
 	/* STDIN일 때: */
 	if (fd == STDIN_FILENO) {
 		char key;
-		for (int read_count = 0; read_count < size; read_count++) {
+		for (unsigned int read_count = 0; read_count < size; read_count++) {
 			key  = input_getc();
 			*buf++ = key;
 			if (key == '\0') { // 엔터값
@@ -245,7 +247,7 @@ read (int fd, void *buffer, unsigned size) {
 
 int
 write (int fd, const void *buffer, unsigned size) {
-	check_address(buffer);
+	check_address((void *) buffer);
 	struct file *fileobj = fd_to_struct_filep(fd);
 	int read_count;
 	if (fd == STDOUT_FILENO) {
