@@ -221,8 +221,8 @@ thread_create (const char *name, int priority,
 		return TID_ERROR;
 	}
 	t->fdidx = 2; // 0은 stdin, 1은 stdout에 이미 할당
-	t->file_descriptor_table[0] = 1; // stdin 자리: 1 배정
-	t->file_descriptor_table[1] = 2; // stdout 자리: 2 배정
+	t->file_descriptor_table[0] = 1; // stdin 자리: 1 배정 , 그냥 더미 값
+	t->file_descriptor_table[1] = 2; // stdout 자리: 2 배정 , 그냥 더미 값
 
 	thread_unblock (t);
 	/* create 후 ready_list에 add 시 new thread와 current thread의 우선순위 비교, 
