@@ -260,8 +260,12 @@ read (int fd, void *buffer, unsigned size) {
 int
 write (int fd, const void *buffer, unsigned size) {
 	check_address((void *) buffer);
+	check_address((void *) buffer + size); // 버퍼 끝 주소도 유저 영역 내에 있는지 체크
 	struct file *fileobj = fd_to_struct_filep(fd);
 	int read_count;
+	if(fileobj == NULL){
+		exit(-1);
+	}
 	if (fd == STDOUT_FILENO) {
 		putbuf(buffer, size);
 		read_count = size;
