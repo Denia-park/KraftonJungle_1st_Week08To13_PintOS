@@ -82,9 +82,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case SYS_EXIT:
 			exit(f->R.rdi);
 			break;
-		// case SYS_FORK:
-			// f->R.rax = fork(f->R.rdi, f);
-			// break;
+		case SYS_FORK:
+			f->R.rax = fork(f->R.rdi, f);	
+			break;	
 		case SYS_EXEC:
 			if (exec((char *)f->R.rdi) == -1) {
 				exit(-1);
@@ -158,6 +158,11 @@ exec(char *file_name) {
 
 	NOT_REACHED();
 	return 0;
+}
+
+pid_t
+fork (const char *thread_name, struct intr_frame *f){
+	return process_fork(thread_name, f);
 }
 
 bool

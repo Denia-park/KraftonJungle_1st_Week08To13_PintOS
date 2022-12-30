@@ -5,6 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#include "threads/synch.h"
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -125,6 +126,14 @@ struct thread {
 
 	/* Shared between thread.c and synch.c. */
 	struct list_elem d_elem; // 도네이션 element
+
+	struct list child_list; // _fork(), wait() 구현 때 사용
+    struct list_elem child_elem; // _fork(), _wait() 구현 때 사용
+    struct intr_frame parent_if; // _fork() 구현 때 사용, __do_fork() 함수
+
+	struct semaphore fork_sema;
+	struct semaphore wait_sema;
+	struct semaphore free_sema;
 };
 
 /* If false (default), use round-robin scheduler.

@@ -3,6 +3,9 @@
 
 #include "../lib/stdbool.h"
 #include "../lib/kernel/stdio.h"
+#include "threads/interrupt.h"
+
+typedef int pid_t;
 
 void syscall_init (void);
 void check_address(void *addr);
@@ -20,5 +23,7 @@ void seek (int fd, unsigned position);
 int read (int fd, void *buffer, unsigned size);
 unsigned tell (int fd);
 int exec(char *file_name);
+struct thread * get_child(int pid);
+pid_t fork (const char *thread_name, struct intr_frame *f);
 
 #endif /* userprog/syscall.h */
