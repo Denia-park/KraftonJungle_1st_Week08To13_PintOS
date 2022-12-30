@@ -90,9 +90,9 @@ syscall_handler (struct intr_frame *f UNUSED) {
 				exit(-1);
 			}
 			break;
-		// case SYS_WAIT:
-		// 	f->R.rax = process_wait(f->R.rdi);
-		// 	break;
+		case SYS_WAIT:
+			f->R.rax = process_wait(f->R.rdi);
+			break;
 		case SYS_CREATE:
 			f->R.rax = create((char *) f->R.rdi, f->R.rsi);		
 			break;
