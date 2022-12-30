@@ -314,25 +314,25 @@ write (int fd, const void *buffer, unsigned size) {
 
 void
 seek (int fd, unsigned position) {
+	struct file *file = fd_to_struct_filep(fd);
+
 	//std in , out 을 지칭하면 바로 return
-	if (fd < 2) {
+	if (file == NULL || fd < 2) {
 		return;
 	}
-
-	struct file *file = fd_to_struct_filep(fd);
-	check_address((void *) file);
 
 	file_seek(file, position);
 }
 
 unsigned
 tell (int fd) {
+	struct file *file = fd_to_struct_filep(fd);
+
 	//std in , out 을 지칭하면 바로 return
-	if (fd <2) {
-		return 0;
+	if (file == NULL || fd < 2) {
+		return;
 	}
 
-	struct file *file = fd_to_struct_filep(fd);
 	check_address((void *) file);
 
 	return file_tell(file);
@@ -340,12 +340,13 @@ tell (int fd) {
 
 void
 close (int fd) {
-		//std in , out 을 지칭하면 바로 return
-	if (fd <2) {
+	struct file *file = fd_to_struct_filep(fd);
+
+	//std in , out 을 지칭하면 바로 return
+	if (file == NULL || fd < 2) {
 		return;
 	}
 
-	struct file *file = fd_to_struct_filep(fd);
 	make_fd_to_null(fd);
 
 	file_close(file);
