@@ -19,5 +19,6 @@ int filesize (int fd);
 void seek (int fd, unsigned position);
 int read (int fd, void *buffer, unsigned size);
 unsigned tell (int fd);
+int exec(char *file_name);
 
 #endif /* userprog/syscall.h */

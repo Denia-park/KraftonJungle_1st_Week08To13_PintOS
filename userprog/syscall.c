@@ -3,6 +3,7 @@
 #include "filesys/file.h"
 #include "devices/input.h"
 #include <stdio.h>
+#include <string.h>
 #include <syscall-nr.h>
 #include "threads/init.h"
 #include "threads/synch.h"
@@ -12,6 +13,8 @@
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "intrinsic.h"
+#include "threads/palloc.h"
+#include "userprog/process.h"
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
@@ -80,14 +83,16 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			exit(f->R.rdi);
 			break;
 		// case SYS_FORK:
-		// 	fork(f->R.rdi);	
-			// break;	
-		// case SYS_EXEC:
-		// 	exec(f->R.rdi);
+			// f->R.rax = fork(f->R.rdi, f);
 			// break;
+		case SYS_EXEC:
+			if (exec((char *)f->R.rdi) == -1) {
+				exit(-1);
+			}
+			break;
 		// case SYS_WAIT:
-		// 	wait(f->R.rdi);
-			// break;
+		// 	f->R.rax = process_wait(f->R.rdi);
+		// 	break;
 		case SYS_CREATE:
 			f->R.rax = create((char *) f->R.rdi, f->R.rsi);		
 			break;
@@ -133,6 +138,28 @@ exit (int status) {
 	printf("%s: exit(%d)\n", thread_name(), curr->exit_status);
 	thread_exit();
 }
+
+// 현재 프로세스를 cmd_line에서 지정된 인수를 전달하여 이름이 지정된 실행 파일로 변경
+int 
+exec(char *file_name) {
+	check_address(file_name);
+
+	int name_length = strlen(file_name) + 1; //Null 포함
+	char *fn_copy = palloc_get_page(PAL_ZERO);
+	if (fn_copy == NULL) {
+		exit(-1);
+	}
+
+	strlcpy(fn_copy, file_name, name_length);
+
+	if (process_exec(fn_copy) == -1) {
+		return -1;
+	}
+
+	NOT_REACHED();
+	return 0;
+}
+
 bool
 create (const char *file_name, unsigned initial_size) {
 	check_address ((void *)file_name);
