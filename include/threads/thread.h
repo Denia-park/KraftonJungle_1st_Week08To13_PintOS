@@ -115,6 +115,8 @@ struct thread {
 	int exit_status;
 	struct file **file_descriptor_table; //FDT
 	int fdidx; // fd index
+
+	struct file *running_file;			// SJ, 현재 쓰레드가 사용 중인 파일
 	
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */

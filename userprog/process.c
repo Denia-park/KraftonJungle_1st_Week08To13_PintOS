@@ -297,6 +297,8 @@ process_exit (void) {
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
+	file_close(curr->running_file);
+
 	for (int i = 0; i < FDT_COUNT_LIMIT; i++) {
 		close(i);
 	}
@@ -522,9 +524,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	
 	success = true;
 
+	t->running_file = file;
+	file_deny_write(file);
+
 done:
 	/* We arrive here whether the load is successful or not. */
-	file_close (file);
 	return success;
 }
 
