@@ -107,9 +107,7 @@ process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 	/* --- Project 2: system call --- */
 	struct thread *child = get_child(tid);
 	sema_down(&child->fork_sema);
-	if (child->exit_status == -1) {
-		return TID_ERROR;
-	}
+
 	return tid;
 }
 
