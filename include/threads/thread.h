@@ -30,7 +30,8 @@ typedef int tid_t;
 #define PRI_MAX 63                      /* Highest priority. */
 
 #define FDT_PAGES 3
-#define FDT_COUNT_LIMIT FDT_PAGES *(1<<9) // limit fdidx
+// #define FDT_COUNT_LIMIT FDT_PAGES *(1<<9) // limit fdidx
+#define FDT_COUNT_LIMIT FDT_PAGES *(130) // limit fdidx
 
 /* A kernel thread or user process.
  *

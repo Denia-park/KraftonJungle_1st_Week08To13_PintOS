@@ -418,7 +418,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 
 	//Argument Passing
-	char *arg_list[128];
+	char *arg_list[64];
 	char *token, *save_ptr;
 	int token_count = 0;
 
@@ -532,7 +532,7 @@ done:
 
 void
 argument_stack(char **argv, int argc, struct intr_frame *if_){
-	char *arg_address[128];
+	char *arg_address[64];
 
 	// 거꾸로 삽입 => 스택은 반대 방향으로 확장
 
